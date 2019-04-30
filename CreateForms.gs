@@ -1,7 +1,29 @@
 function onOpen() {
-  var menu = [{name: 'Set up Silent Auctions', functionName: 'runScript'}];
+  var menu = [{name: 'Set up Silent Auctions', functionName: 'runScript'}, {name: 'Create Auction Doc', functionName: 'createAuctionDoc'},
+              {name: 'Sort Auction Bids by Highest Bid', functionName: 'sortBids'} ];
   SpreadsheetApp.getActive().addMenu('Auctions', menu);
 }
+
+function sortSheet(studentFormName) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(studentFormName);
+  var data = sheet.getDataRange().getValues();
+  var range = sheet.getRange("A2:D" + data.length+1);
+
+ // Sorts by the values in column 2 (B)
+ range.sort({column: 4, ascending: false});
+  
+}
+
+function sortBids(){
+  var sheetsNames = [];
+  sheetsNames = getSheetsNames();
+  for (i=3; i<sheetsNames.length; i++){
+    sortSheet(sheetsNames[i]);
+  }
+  
+}
+
 
 /**
 * Saves new form information to sheet called auctionFormInfo
@@ -10,10 +32,10 @@ function onOpen() {
 * @param {str}    newFormDestID
 * @param {str}    newFormURL
 **/
-function saveFormInfo(studentFormName,newFormDestID,newFormURL, sheetURL){
+function saveFormInfo(photoID,studentName,artworkTitle,newFormURL,sheetURL,period){
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName("auctionFormInfo");
-  sheet.appendRow([studentFormName,newFormDestID,newFormURL, sheetURL, studentFormName]); 
+  sheet.appendRow([photoID,studentName,artworkTitle,newFormURL, sheetURL, period]); 
 }
 
 /**
@@ -147,7 +169,7 @@ function createForm(studentFormName, values, photoID, ss) {
 
 function runScript(){
   var ss = SpreadsheetApp.openById("1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I");
-  var sheet = ss.getActiveSheet();
+  var sheet = ss.getSheetByName("AuctionSetup");
   var data = sheet.getDataRange().getValues();
   var sheets = ss.getSheets();
   
@@ -156,10 +178,13 @@ function runScript(){
   //for (var i=1; i<3; i++){
     var values = data[i];
     var studentFormName = values[3] + "_" + values[1] + "_" + values[2];
+    var studentName = values[1];
+    var artworkTitle = values[2]; 
     var urlArray = [{}];
-    var url = values[4];
-    var urlArray = url.split("id=");
+    var photoUrl = values[4];
+    var urlArray = photoUrl.split("id=");
     var photoID = urlArray[1];
+    var period = values[3];
     photoID = photoID.toString().replace("\"","");
     
     //create the form and return id and url of form into formInfo
@@ -178,7 +203,86 @@ function runScript(){
     var newFormID = formInfo[2];
     var sheetURL = "https://docs.google.com/spreadsheets/d/1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I/edit#gid=" + newSheetID
     
-    saveFormInfo(studentFormName,newFormID,newFormURL,sheetURL);
+    saveFormInfo(photoID,studentName,artworkTitle,newFormURL,sheetURL,period);
+    
   }
   
+  var SORT_DATA_RANGE = "A2:F" + data.length+1;
+  var SORT_ORDER = [
+    {column: 6, ascending: true},  // 5 = period column, sort by ascending order 
+    {column: 2, ascending: true} // 2 = Student Name column number, sort by ascending order 
+  ];
+  ss = SpreadsheetApp.getActiveSpreadsheet();
+  sheet = ss.getSheetByName("auctionFormInfo");
+  var range = sheet.getRange(SORT_DATA_RANGE);
+  range.sort(SORT_ORDER);
+  
+  
+}
+function createAuctionDoc(){
+  
+  var headerStyle = {};  
+  headerStyle[DocumentApp.Attribute.BACKGROUND_COLOR] = '#336600';  
+  headerStyle[DocumentApp.Attribute.BOLD] = true;  
+  headerStyle[DocumentApp.Attribute.FOREGROUND_COLOR] = '#FFFFFF';
+  
+  var cellStyle = {};
+  cellStyle[DocumentApp.Attribute.BOLD] = false;  
+  cellStyle[DocumentApp.Attribute.FOREGROUND_COLOR] = '#000000';
+  
+  var paraStyle = {};
+  paraStyle[DocumentApp.Attribute.SPACING_AFTER] = 0;
+  paraStyle[DocumentApp.Attribute.LINE_SPACING] = 1;
+  
+  var folder=DriveApp.getFoldersByName('Silent Auction').next();
+  var ss = SpreadsheetApp.openById("1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I");
+  var sheet = ss.getSheetByName("auctionFormInfo");
+  var data = sheet.getDataRange().getValues();
+  var doc = DocumentApp.create('Silent Auction Links');
+  var body = doc.getBody();
+  var rowsData = ['Photo', 'Artwork By','Class Period', 'Artwork Title', 'Link to Artwork Auction'];
+  body.insertParagraph(0, "Silent Auction Links")
+      .setHeading(DocumentApp.ParagraphHeading.HEADING1);
+  table = body.appendTable();
+  var tr = table.appendTableRow();
+  
+  //create header row
+  for (var i=0; i<rowsData.length; i++){
+    var td = tr.appendTableCell(rowsData[i]);
+    td.setAttributes(headerStyle);
+  }
+  
+  //create one row for each peice of artwork in AuctionInfo sheet
+  for (var i=1; i<data.length; i++){
+    var tr = table.appendTableRow();
+    var rowsData = data[i];
+    
+    //inserts photo of artwork
+    var photoBlob   = DriveApp.getFileById(rowsData[0]).getBlob();
+    var td = tr.appendTableCell().appendImage(photoBlob).setWidth("100").setHeight("75");
+    
+    //inserts student name
+    td = tr.appendTableCell(rowsData[1]);
+    td.setAttributes(cellStyle); 
+    
+    //insert period information
+    td = tr.appendTableCell(rowsData[5]);
+    td.setAttributes(cellStyle);
+    
+    //inserts title of artwork
+    td = tr.appendTableCell(rowsData[2]);
+    td.setAttributes(cellStyle);
+    
+    //inserts link to auction form
+    td = tr.appendTableCell().editAsText().insertText(0, "Silent Auction link for " + rowsData[2] + " by " + rowsData[1]).setLinkUrl(rowsData[3]);
+    td.setAttributes(cellStyle);
+      
+  }
+    
+    
+  
+  
+  
+  
+  saveItemInFolder(doc,folder);
 }
