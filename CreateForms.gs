@@ -1,6 +1,6 @@
 function onOpen() {
   var menu = [{name: 'Set up Silent Auctions', functionName: 'runScript'}, {name: 'Create Auction Doc', functionName: 'createAuctionDoc'},
-              {name: 'Sort Auction Bids by Highest Bid', functionName: 'sortBids'} ];
+              {name: 'Tabulate Bids', functionName: 'tabulateBids'} ];
   SpreadsheetApp.getActive().addMenu('Auctions', menu);
 }
 
@@ -15,17 +15,30 @@ function sortBidSheet(studentFormName) {
   var data = sheet.getDataRange().getValues();
   var range = sheet.getRange("A2:D" + data.length+1);
 
- // Sorts by the values in column 4 (D)
- range.sort({column: 4, ascending: false});
+ // Sorts by the values in column 4 (D) and then by timestamp
+ range.sort([{column: 4, ascending: false},{column: 1, ascending: true}]);
 }
-/**Call the sorting to all the individual bid sheets to be sorted
+/**
+* Call the sorting to all the individual bid sheets to be sorted
+* takes higest bid and earliest timestamp and copies data to 
+* BidTabulation sheet
 **/
 
-function sortBids(){
+function tabulateBids(){
+  var ss   =  SpreadsheetApp.openById("1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I");
+  var bidTabSheet = ss.getSheetByName("BidTabulation");
+  bidTabSheet.clear();
+  bidTabSheet.appendRow(["Artwork","Bidder\'s Name", "Bidder\'s Email Address", "Bid Amount"]);
+  
   var sheetsNames = [];
   sheetsNames = getSheetsNames();
   for (i=3; i<sheetsNames.length; i++){
     sortBidSheet(sheetsNames[i]);
+    Utilities.sleep(2000);
+    SpreadsheetApp.flush();
+    var sheet = ss.getSheetByName(sheetsNames[i]);
+    var data = sheet.getDataRange().getValues();
+    bidTabSheet.appendRow([sheetsNames[i],data[1][1], data[1][2], data[1][3]]);
   }
 }
 
