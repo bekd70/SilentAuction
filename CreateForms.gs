@@ -4,33 +4,41 @@ function onOpen() {
   SpreadsheetApp.getActive().addMenu('Auctions', menu);
 }
 
-function sortSheet(studentFormName) {
+/**
+* Sorts each Bid sheet by the bidd in descending order
+* 
+* @param {str}    studentFormName    Name of the form to be sorted
+**/
+function sortBidSheet(studentFormName) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName(studentFormName);
   var data = sheet.getDataRange().getValues();
   var range = sheet.getRange("A2:D" + data.length+1);
 
- // Sorts by the values in column 2 (B)
+ // Sorts by the values in column 4 (D)
  range.sort({column: 4, ascending: false});
-  
 }
+/**Call the sorting to all the individual bid sheets to be sorted
+**/
 
 function sortBids(){
   var sheetsNames = [];
   sheetsNames = getSheetsNames();
   for (i=3; i<sheetsNames.length; i++){
-    sortSheet(sheetsNames[i]);
+    sortBidSheet(sheetsNames[i]);
   }
-  
 }
 
 
 /**
 * Saves new form information to sheet called auctionFormInfo
 * saves url to form and name
-* @param {str}    studentFormName
-* @param {str}    newFormDestID
+* @param {str}    photoID
+* @param {str}    studentName
+* @param {str}    artworkTitle
 * @param {str}    newFormURL
+* @param {str}    sheetURL
+* @param {str}    period
 **/
 function saveFormInfo(photoID,studentName,artworkTitle,newFormURL,sheetURL,period){
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -81,7 +89,6 @@ function renameSheet(studentFormName){
         ss.setActiveSheet(ss.getSheets()[0]);
         //Logger.log(ss.getActiveSheet().getName());
         return newSheetID;
-      
       }
     }
   }
@@ -166,7 +173,22 @@ function createForm(studentFormName, values, photoID, ss) {
   return formInfo;
 }
 
-
+/** Main Function 
+* gets data from the AuctionSetup sheet about that is submitted by the 
+* CreateAuctionForms form.  
+* for each entry:
+*    Gets studentFormName (Period_StudentName_ArtworkTitle), studentName, photo url, and 
+*    photoID.
+*    
+*    Take info to create a bidding form for each entry
+*     
+*    Rename each newly created sheet to studentFormName and returns the sheetID for the sheet
+*    
+*    Save the form information for the form (photoID,studentName,artworkTitle,newFormURL,sheetURL,period) to the AuctionInfo sheet
+*
+* Sort the AuctionInfo by class then student name
+*
+**/
 function runScript(){
   var ss = SpreadsheetApp.openById("1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I");
   var sheet = ss.getSheetByName("AuctionSetup");
@@ -207,6 +229,8 @@ function runScript(){
     
   }
   
+  //sort the AuctionInfor Sheet so that when createAuction() is run it will
+  //pull the infor by class and then by student name.
   var SORT_DATA_RANGE = "A2:F" + data.length+1;
   var SORT_ORDER = [
     {column: 6, ascending: true},  // 5 = period column, sort by ascending order 
@@ -215,10 +239,14 @@ function runScript(){
   ss = SpreadsheetApp.getActiveSpreadsheet();
   sheet = ss.getSheetByName("auctionFormInfo");
   var range = sheet.getRange(SORT_DATA_RANGE);
-  range.sort(SORT_ORDER);
-  
-  
+  range.sort(SORT_ORDER); 
 }
+
+/**
+*    Create Google Doc with link to Auction form, Student name and Class period
+*    and photo of the artwork
+*
+**/
 function createAuctionDoc(){
   
   var headerStyle = {};  
@@ -278,11 +306,6 @@ function createAuctionDoc(){
     td.setAttributes(cellStyle);
       
   }
-    
-    
-  
-  
-  
-  
+  //move doc to the auction folder
   saveItemInFolder(doc,folder);
 }
