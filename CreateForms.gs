@@ -1,9 +1,10 @@
-//change this to the ID of your spreadsheet after you copy it
+//change this to the ID of your spreadsheet after you copy it 
 var spreadsheetID = "1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I";
 
 //change the name of the folder to match an existing folder you would like to keep the forms in
 var folderName = 'Silent Auction';
 
+//set Auction menu and menu items
 function onOpen() {
   var menu = [{name: 'Set up Silent Auctions', functionName: 'runScript'}, {name: 'Create Auction Doc', functionName: 'createAuctionDoc'},
               {name: 'Tabulate Bids', functionName: 'tabulateBids'} ];
