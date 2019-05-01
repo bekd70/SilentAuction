@@ -62,7 +62,7 @@ function clearTestingData() {
 /**
 * Sorts each Bid sheet by the bidd in descending order
 * 
-* @param {str}    studentFormName    Name of the form to be sorted
+* @param {String}    studentFormName    Name of the form to be sorted
 **/
 function sortBidSheet(studentFormName) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -101,12 +101,12 @@ function tabulateBids(){
 /**
 * Saves new form information to sheet called auctionFormInfo
 * saves url to form and name
-* @param {str}    photoID
-* @param {str}    studentName
-* @param {str}    artworkTitle
-* @param {str}    newFormURL
-* @param {str}    sheetURL
-* @param {str}    period
+* @param {String}    photoID
+* @param {String}    studentName
+* @param {String}    artworkTitle
+* @param {String}    newFormURL
+* @param {String}    sheetURL
+* @param {String}    period
 **/
 function saveFormInfo(photoID,studentName,artworkTitle,newFormURL,sheetURL,period){
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -136,7 +136,7 @@ function saveFormInfo(photoID,studentName,artworkTitle,newFormURL,sheetURL,perio
  * The sheet is then moved to the end of the list.
  * Auction Setup is then made the active sheet again
  *
- * @param {str}  studentFormName     String from the concatenation of Period_StudentName_Preiod
+ * @param {String}  studentFormName     String from the concatenation of Period_StudentName_Preiod
  * 
  */
 function renameSheet(studentFormName){
@@ -188,7 +188,7 @@ function saveItemInFolder(item,folder) {
 * that is in Google Sheet
 * @param  {str}  studentFormName     String from the concatenation of Period_StudentName_Preiod
 * @param {array}    values   values pulled from row of sheet to populate form
-* @param {str}   photoID    ID of the photo stored on google drive
+* @param {String}   photoID    ID of the photo stored on google drive
 * @param {obj} ss     spreadsheet to store form data on
 **/
 function createForm(studentFormName, values, photoID, ss) {
