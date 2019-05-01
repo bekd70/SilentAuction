@@ -1,3 +1,9 @@
+//change this to the ID of your spreadsheet after you copy it
+var spreadsheetID = "1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I";
+
+//change the name of the folder to match an existing folder you would like to keep the forms in
+var folderName = 'Silent Auction';
+
 function onOpen() {
   var menu = [{name: 'Set up Silent Auctions', functionName: 'runScript'}, {name: 'Create Auction Doc', functionName: 'createAuctionDoc'},
               {name: 'Tabulate Bids', functionName: 'tabulateBids'} ];
@@ -25,7 +31,7 @@ function sortBidSheet(studentFormName) {
 **/
 
 function tabulateBids(){
-  var ss   =  SpreadsheetApp.openById("1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I");
+  var ss   =  SpreadsheetApp.openById(spreadsheetID);
   var bidTabSheet = ss.getSheetByName("BidTabulation");
   bidTabSheet.clear();
   bidTabSheet.appendRow(["Artwork","Bidder\'s Name", "Bidder\'s Email Address", "Bid Amount"]);
@@ -64,7 +70,7 @@ function saveFormInfo(photoID,studentName,artworkTitle,newFormURL,sheetURL,perio
 * an array (sheetNames) and returns array
 **/
  function getSheetsNames(){
-   var ss   =  SpreadsheetApp.openById("1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I");
+   var ss   =  SpreadsheetApp.openById(spreadsheetID);
    var sheetsName = [];
    var sheets = ss.getSheets();
    Logger.log ("the sheet length is " + sheets.length);
@@ -86,7 +92,7 @@ function saveFormInfo(photoID,studentName,artworkTitle,newFormURL,sheetURL,perio
  */
 function renameSheet(studentFormName){
  
-  var ss = SpreadsheetApp.openById("1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I");
+  var ss = SpreadsheetApp.openById(spreadsheetID);
   var sheets =ss.getSheets();
   var pos = ss.getNumSheets();
   //Logger.log("There are " + pos + " sheets");
@@ -179,7 +185,7 @@ function createForm(studentFormName, values, photoID, ss) {
   .setRequired(true);
   
   //saves forms in folder specified and removes
-  var folder=DriveApp.getFoldersByName('Silent Auction').next();
+  var folder=DriveApp.getFoldersByName(folderName).next();
   saveItemInFolder(form,folder);
   Utilities.sleep(2000);
   SpreadsheetApp.flush();
@@ -204,7 +210,7 @@ function createForm(studentFormName, values, photoID, ss) {
 *
 **/
 function runScript(){
-  var ss = SpreadsheetApp.openById("1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I");
+  var ss = SpreadsheetApp.openById(spreadsheetID);
   var sheet = ss.getSheetByName("AuctionSetup");
   var data = sheet.getDataRange().getValues();
   var sheets = ss.getSheets();
@@ -238,7 +244,7 @@ function runScript(){
     var newFormURL = formInfo[0];
     var ssID = formInfo[1];
     var newFormID = formInfo[2];
-    var sheetURL = "https://docs.google.com/spreadsheets/d/1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I/edit#gid=" + newSheetID
+    var sheetURL = "https://docs.google.com/spreadsheets/d/" + spreadsheetID + "/edit#gid=" + newSheetID
     
     saveFormInfo(photoID,studentName,artworkTitle,newFormURL,sheetURL,period);
     
@@ -277,8 +283,8 @@ function createAuctionDoc(){
   paraStyle[DocumentApp.Attribute.SPACING_AFTER] = 0;
   paraStyle[DocumentApp.Attribute.LINE_SPACING] = 1;
   
-  var folder=DriveApp.getFoldersByName('Silent Auction').next();
-  var ss = SpreadsheetApp.openById("1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I");
+  var folder=DriveApp.getFoldersByName(folderName).next();
+  var ss = SpreadsheetApp.openById(spreadsheetID);
   var sheet = ss.getSheetByName("auctionFormInfo");
   var data = sheet.getDataRange().getValues();
   var doc = DocumentApp.create('Silent Auction Links');
