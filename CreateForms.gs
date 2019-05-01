@@ -67,8 +67,10 @@ function saveFormInfo(photoID,studentName,artworkTitle,newFormURL,sheetURL,perio
    var ss   =  SpreadsheetApp.openById("1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I");
    var sheetsName = [];
    var sheets = ss.getSheets();
+   Logger.log ("the sheet length is " + sheets.length);
    for( var i = 0; i < sheets.length; i++ ){
      sheetsName.push(sheets[i].getName() );
+     Logger.log("The sheet being pushed is " + sheetsName[i]);
    };
    return sheetsName;
  }
@@ -87,20 +89,19 @@ function renameSheet(studentFormName){
   var ss = SpreadsheetApp.openById("1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I");
   var sheets =ss.getSheets();
   var pos = ss.getNumSheets();
-  //Logger.log(pos)
+  //Logger.log("There are " + pos + " sheets");
   var sheetNames = getSheetsNames();
- // Logger.log(sheetNames);
+  //Logger.log(sheetNames);
   for (var i = 0; i<pos;i++){
     if (sheetNames[i]) {
       if (sheetNames[i].indexOf('Form Responses') > -1) {
-        //Logger.log("Present");
+        Logger.log("Present");
         var first = ss.getSheets()[i];
         ss.setActiveSheet(ss.getSheets()[i]);
         first.setName(studentFormName);
         var newSheetID = first.getSheetId();
         ss.moveActiveSheet(pos);
         ss.setActiveSheet(ss.getSheets()[0]);
-        //Logger.log(ss.getActiveSheet().getName());
         return newSheetID;
       }
     }
@@ -227,6 +228,7 @@ function runScript(){
     //formInfo[1] is ssID
     //formInfo[2] is form destination id
     var formInfo = createForm(studentFormName, values, photoID, ss);
+    //Logger.log(formInfo);
     
     //rename newly created form to the studentFormName
     //return value is id of new sheet
