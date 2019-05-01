@@ -1,2 +1,4 @@
 # SilentAuction
-Use Google App Script to create Silent Auction forms from input from Google Sheet.
+Use Google App Script to create Silent Auction forms for student artwork from input from google form.  Form allows you to specify student name, artwork title, class, and photo of artwork.  Once form has been filled out for each piece of student artwork, run "Set Up Silent Auctions" from the Auction menu.  Then run "Create Auction Doc" from the Auction menu to create a google doc with photo, student name, class, and link to individual auction forms.  After the auction time has closed, run "Tabulate Bids" from the auction menu to see the highest bidder for each auction piece.
+Link to spreadsheet: https://docs.google.com/spreadsheets/d/1YktYIZHyah-ZfUObavpQHENJpOU1v1QMfdcZbz4iR1I/copy
+Link to form: https://docs.google.com/forms/d/1YTpi0Zs6LtV6WPwy58-eOQ52PhZ82Cpqiu0HI1S-NI8/copy
